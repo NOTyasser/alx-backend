@@ -1,21 +1,22 @@
 #!/usr/bin/env python3
-""" module doc """
+"""
+Adds `get_page` method to `Server` class
+"""
 import csv
-import math
 from typing import List, Tuple
 
 
 class Server:
-    """Server class to paginate a database of popular baby names."""
-
+    """Server class to paginate a database of popular baby names.
+    """
     DATA_FILE = "Popular_Baby_Names.csv"
 
     def __init__(self):
-        """ func doc """
         self.__dataset = None
 
     def dataset(self) -> List[List]:
-        """Cached dataset"""
+        """Cached dataset
+        """
         if self.__dataset is None:
             with open(self.DATA_FILE) as f:
                 reader = csv.reader(f)
@@ -24,14 +25,24 @@ class Server:
 
         return self.__dataset
 
-    def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
-        """Get page from the dataset"""
-        assert isinstance(page, int) and isinstance(page_size, int)
-        assert page > 0 and page_size > 0
-        start, end = self.index_range(page, page_size)
-        return self.dataset()[start:end]
+    @staticmethod
+    def index_range(page: int, page_size: int) -> Tuple[int, int]:
+        """Calculate start and end index range for a `page`, with `page_size`
+        """
+        nextPageStartIndex = page * page_size
+        return nextPageStartIndex - page_size, nextPageStartIndex
 
-    def index_range(self, page: int, page_size: int) -> tuple:
-        """returns a tuple of size two
-        containing a start index and an end index"""
-        return (page - 1) * page_size, page * page_size
+    def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
+        """
+        Get items for the given page number
+        Args:
+            page (int): page number
+            page_size (int): number of items per page
+        Returns:
+            (List[List]): a list of list(row) if inputs are within range
+            ([]) : an empty list if page and page_size are out of range
+        """
+        assert type(page) == int and type(page_size) == int
+        assert page > 0 and page_size > 0
+        startIndex, endIndex = self.index_range(page, page_size)
+        return self.dataset()[startIndex:endIndex]
